@@ -7,7 +7,7 @@ wallets from a PHP application.
 
 ## Full example
 
-The [FCLTest.php](https://github.com/onflow/fcl-php-authn-example/blob/main/tests/FCLTest.php#L16-L72) contains a complete end-to-end example of the authentication process.
+The [FCLTest.php](https://github.com/onflow/fcl-php-authn-example/blob/main/tests/FCLTest.php#L16-L72) file contains a complete end-to-end example of the authentication process.
 
 ## Getting started
 
