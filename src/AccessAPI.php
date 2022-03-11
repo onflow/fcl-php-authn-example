@@ -36,15 +36,4 @@ final class AccessAPI extends HTTPClient
 
         return new Account($address, $keys);
     }
-
-    private function json_to_account_key($data): AccountKey {
-        return new AccountKey(
-            $data["key_index"],
-            $data["public_key"],
-            $data["signing_algorithm"],
-            $data["hashing_algorithm"],
-            intval($data["weight"]),
-            $data["revoked"]
-        );
-    }
 }
