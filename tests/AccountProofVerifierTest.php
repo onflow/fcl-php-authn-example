@@ -34,21 +34,12 @@ final class AccountProofVerifierTest extends TestCase
             )
         );
 
-        $verify_func = function(
-            string $public_key, // hexadecimal string encoding of a 64-byte array representing the public key [x||y] where x and y are the key coordinates, each left-padded to 32 bytes
-            string $sig_algo,   // one of "ECDSA_P256" or "ECDSA_secp256k1"
-            string $hash_algo,  // one of "SHA2_256" or "SHA3_256"
-            string $message,    // hexadeciaml string encoding of the encoded account proof message
-            string $signature   // hexadecimal string encoding of a 64-byte array representing the signature [r||s] where r and s are the signature components, each left-padded to 32 bytes
-        ): bool {
-            return true;
-        };
-
         $verifier = new AccountProofVerifier(
             $account,
             $app_id,
             $nonce,
-            $verify_func
+            // MockSignatureVerifier always returns true for signature verification
+            new MockSignatureVerifier()
         );
 
         $signatures = array(

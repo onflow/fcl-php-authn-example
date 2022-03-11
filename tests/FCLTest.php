@@ -49,25 +49,15 @@ final class FCLTest extends TestCase
             // Fetch the user account data from the Flow blockchain
             $client = new AccessAPI("https://rest-mainnet.onflow.org");
             $account = $client->get_account(address);
-
-            $verify_func = function(
-                string $public_key, // hexadecimal string encoding of a 64-byte array representing the public key [x||y] where x and y are the key coordinates, each left-padded to 32 bytes
-                string $sig_algo,   // one of "ECDSA_P256" or "ECDSA_secp256k1"
-                string $hash_algo,  // one of "SHA2_256" or "SHA3_256"
-                string $message,    // hexadeciaml string encoding of the encoded account proof message
-                string $signature   // hexadecimal string encoding of a 64-byte array representing the signature [r||s] where r and s are the signature components, each left-padded to 32 bytes
-            ): bool {
-                return true;
-            };
     
-            $account_proof_verifier = new AccountProofVerifier(
+            $verifier = new AccountProofVerifier(
                 $account,
                 $app_id,
                 $nonce,
-                $verify_func
+                new SampleSignatureVerifier()
             );
 
-            $verified = $account_proof_verifier->verify($signatures);
+            $verified = $verifier->verify($signatures);
         }
     }
 }

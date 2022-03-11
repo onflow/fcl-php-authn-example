@@ -21,10 +21,15 @@ final class AccessAPI extends HTTPClient
 
         $address = $response["address"];
 
+
         $json_to_account_key = function($data): AccountKey {
+
+            // strip 0x prefix from public key
+            $public_key = substr($data["public_key"], 2);
+
             return new AccountKey(
                 intval($data["index"]),
-                $data["public_key"],
+                $public_key,
                 $data["signing_algorithm"],
                 $data["hashing_algorithm"],
                 intval($data["weight"]),

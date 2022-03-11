@@ -6,30 +6,28 @@ final class AccountProofVerifier {
 
     private $account;
     private $account_proof;
-    private $verify_func;
+    private $verifier;
 
     function __construct(
         Account $account,
         string $app_id,
         string $nonce,
-        $verify_func
+        SignatureVerifier $verifier
     ) {
         $this->account = $account;
         $this->account_proof = new AccountProof(
-            $account->address, 
             $app_id, 
+            $account->address,
             $nonce
         );
 
-        $this->verify_func = $verify_func;
+        $this->verifier = $verifier;
     }
 
     function verify(array $signatures): bool {
         $message = $this->account_proof->encode();
 
         $weight = 0;
-
-        $verify = $this->verify_func;
 
         foreach ($signatures as $signature) {
 
@@ -43,7 +41,7 @@ final class AccountProofVerifier {
                 return false;
             }
 
-            $is_valid = $verify(
+            $is_valid = $this->verifier->verify(
                 $key->public_key,
                 $key->sig_algo,
                 $key->hash_algo,
