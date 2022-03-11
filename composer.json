@@ -1,0 +1,36 @@
+{
+    "name": "onflow/fcl-php-authn",
+    "description": "A sample repository that shows how to authentication with FCL wallets from a PHP application.",
+    "keywords": ["flow", "fcl"],
+    "license": "MIT",
+    "require": {
+        "php": "^7.2",
+        "web3p/rlp": "^0.3.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.0",
+        "friendsofphp/php-cs-fixer": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Vendor\\Package\\": "src"
+        },
+        "classmap": [
+            "src/"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Vendor\\Package\\": "tests"
+        },
+        "classmap": [
+            "src/"
+        ]
+    },
+    "config": {
+        "platform": {
+            "php": "7.2"
+        },
+        "sort-packages": true
+    }
+}
