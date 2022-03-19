@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-final class AccountKey {
-
+final class AccountKey
+{
     public $index;
     public $public_key;
     public $sig_algo;
@@ -11,7 +11,7 @@ final class AccountKey {
     public $weight;
     public $revoked;
 
-    function __construct(
+    public function __construct(
         int $index,
         string $public_key,
         string $sig_algo,
@@ -33,13 +33,14 @@ final class Account
     public $address;
     public $keys;
 
-    function __construct(string $address, array $keys)
+    public function __construct(string $address, array $keys)
     {
         $this->address = $address;
         $this->keys = $keys;
     }
 
-    function get_key(int $key_index) {
+    public function get_key(int $key_index)
+    {
         foreach ($this->keys as $key) {
             if ($key->index == $key_index) {
                 return $key;

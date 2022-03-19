@@ -2,60 +2,88 @@
 
 declare(strict_types=1);
 
-final class AccountProofVerifier {
+const TESTNET = "testnet";
+const MAINNET = "mainnet";
 
-    private $account;
-    private $account_proof;
-    private $verifier;
+final class AccountProofVerifier
+{
+    private $network;
+    private $client;
 
-    function __construct(
-        Account $account,
-        string $app_id,
-        string $nonce,
-        SignatureVerifier $verifier
+    public function __construct(
+        string $network,
+        AccessAPIClient $client,
     ) {
-        $this->account = $account;
-        $this->account_proof = new AccountProof(
-            $app_id, 
-            $account->address,
-            $nonce
-        );
-
-        $this->verifier = $verifier;
+        $this->network = $network;
+        $this->client = $client;
     }
 
-    function verify(array $signatures): bool {
-        $message = $this->account_proof->encode();
+    public function verify(
+        AccountProof $account_proof,
+        array $signatures
+    ): bool {
+        $address = $account_proof->address;
+        $message = $account_proof->encode();
 
-        $weight = 0;
+        $verify_script = $this::get_verify_script($this->network);
 
-        foreach ($signatures as $signature) {
+        $key_indices = array_map(
+            function (AccountSignature $sig) {
+                return $sig->key_index;
+            },
+            $signatures
+        );
 
-            $key = $this->account->get_key($signature->key_index);
+        $raw_signatures = array_map(
+            function (AccountSignature $sig) {
+                return $sig->signature;
+            },
+            $signatures
+        );
 
-            if ($key == null) {
-                return false;
-            }
+        $result = $this->client->execute_script(
+            $verify_script,
+            array(
+                Cadence::address($address),
+                Cadence::string($message),
+                Cadence::array_int($key_indices),
+                Cadence::array_string($raw_signatures),
+            )
+        );
 
-            if ($key->revoked) {
-                return false;
-            }
+        return $result["value"];
+    }
 
-            $is_valid = $this->verifier->verify(
-                $key->public_key,
-                $key->sig_algo,
-                $key->hash_algo,
-                $message,
-                $signature->signature
-            );
+    private static function get_verify_script(string $network): string
+    {
+        $contractAddress = AccountProofVerifier::get_contract_address($network);
 
-            if (!$is_valid) {
-                return false;
-            }
+        return <<<EOD
+import FCLCrypto from ${contractAddress}
 
-            $weight += $key->weight;
+pub fun main(
+    address: Address, 
+    message: String, 
+    keyIndices: [Int], 
+    signatures: [String]
+): Bool {
+    return FCLCrypto.verifyAccountProofSignatures(
+        address: address,
+        message: message,
+        keyIndices: keyIndices,
+        signatures: signatures
+    )
+}
+EOD;
+    }
+
+    private static function get_contract_address(string $network): string
+    {
+        switch ($network) {
+        case TESTNET:
+            return "0x74daa6f9c7ef24b1";
+        case MAINNET:
+            return "0xb4b82a1c9d21d284";
         }
-
-        return $weight >= 1000;
     }
 }
